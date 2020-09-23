@@ -1,0 +1,81 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
+```
+
+```{r}
+train_data3 = read.csv('train_data3.csv', stringsAsFactors = FALSE)
+```
+
+```{r}
+train_data3
+```
+
+```{r}
+train_data3$X = NULL
+```
+
+```{r}
+summary(train_data3)
+dim(train_data3)
+str(train_data3)
+```
+
+```{r}
+train_data3$PotentialFraud[train_data3$PotentialFraud == "Yes" ] = 1
+train_data3$PotentialFraud[train_data3$PotentialFraud == "No" ] = 0
+```
+
+```{r}
+train_data3$PotentialFraud <- as.integer(train_data3$PotentialFraud)
+```
+
+
+```{r}
+empty_model = glm(PotentialFraud ~ 1, data = train_data3)
+full_model = glm(PotentialFraud ~ ., data = train_data3) 
+scope = list(lower = formula(empty_model), upper = formula(full_model))
+
+```
+
+```{r}
+library(MASS)
+```
+
+```{r}
+n = (nrow(train_data3))
+forwardBIC = step(empty_model, scope, direction = "forward", k = log(n))
+```
+
+
+```{r}
+
+empty_model = glm(PotentialFraud ~ 1, family = 'binomial', data = train_data3)
+full_model = glm(PotentialFraud ~ ., family = 'binomial', data = train_data3) 
+scope = list(lower = formula(empty_model), upper = formula(full_model))
+
+```
+                    
+```{r}
+n = (nrow(train_data3))
+forwardBIC = step(empty_model, scope, direction = "forward", k = log(n))
+```
+
+```{r}
+backwardBIC = step(full_model, scope, direction = "backward", k = log(n))
+```
+
+```{r}
+bothBIC.empty = step(empty_model, scope, direction = "both", k = log(n))
+```
+
+```{r}
+bothBIC.full = step(full_model, scope, direction = "both", k = log(n))
+```
+
